@@ -36,3 +36,5 @@ pam-auth pipeline-github-lib pipeline-graph-view ssh-slaves timestamper \
 workflow-aggregator ws-cleanup
 
 sudo systemctl restart jenkins
+
+#Pipeline
