@@ -42,11 +42,10 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   }
 } 
 
-resource "null_resource" "example" {
+resource "time_sleep" "wait_for_aks" {
   depends_on = [
     azurerm_kubernetes_cluster.k8s
   ]
-  provisioner "local-exec" {
-    command = "powershell.exe -ExecutionPolicy Bypass -File export_variables.ps1"
-  }
+  create_duration = "45s"
+
 }
