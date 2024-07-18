@@ -21,25 +21,23 @@ resource "helm_release" "cert_manager" {
 }
 
 resource "helm_release" "ingress_nginx" {
-  name             = random_string.azurerm_key_vault_name.result
+  name             = "ingress-nginx"
+  namespace        = "ingress-nginx"
+  create_namespace = true
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
-  namespace        = "ingress"
-  create_namespace = true
 
-  set {
-    name  = "controller.service.loadBalancerIP"
-    value = azurerm_public_ip.ingress_nginx_pip.ip_address
-  }
-
-  lifecycle {
-    ignore_changes = [
-      set,
-    ]
-  }
-
-  depends_on = [
-    helm_release.cert_manager
+  values = [
+    file("ingress-nginx-values.yaml")
   ]
 
+}
+
+resource "time_sleep" "wait_for_ingress" {
+
+    depends_on = [
+      helm_release.ingress_nginx
+    ]
+
+    create_duration = "40s"
 }

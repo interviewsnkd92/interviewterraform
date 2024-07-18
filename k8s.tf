@@ -1,9 +1,9 @@
 resource "kubectl_manifest" "secret_class" {
   depends_on = [
-        time_sleep.wait_for_certmanager
+        time_sleep.wait_for_certmanager                   
     ]
   yaml_body = <<YAML
-apiVersion: secrets-store.csi.x-k8s.io/v1
+apiVersion: secrets-store.csi.x-k8s.io/v1                        
 kind: SecretProviderClass
 metadata:
   name: azure-kvname-user-msi
@@ -61,5 +61,120 @@ spec:
         readOnly: true
         volumeAttributes:
           secretProviderClass: "azure-kvname-user-msi"
+YAML
+}
+
+resource "kubectl_manifest" "deployment" {
+  depends_on = [
+        kubectl_manifest.secret_pod
+    ]
+  yaml_body = <<YAML
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "200Mi"
+          limits:
+            cpu: "500m"
+            memory: "500Mi"
+        volumeMounts:
+        - name: secrets-store01-inline
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      volumes:
+      - name: secrets-store01-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "azure-kvname-user-msi"
+YAML
+}
+
+resource "kubectl_manifest" "service" {
+  depends_on = [
+        kubectl_manifest.deployment
+    ]
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+YAML
+}
+
+resource "kubectl_manifest" "ingress_rule" {
+  depends_on = [
+        kubectl_manifest.service
+    ]
+  yaml_body = <<YAML
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
+YAML
+}
+
+resource "kubectl_manifest" "hpa" {
+  depends_on = [
+        kubectl_manifest.ingress_rule
+    ]
+  yaml_body = <<YAML
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
 YAML
 }

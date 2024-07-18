@@ -30,22 +30,11 @@ resource "azurerm_key_vault" "vault" {
 
   access_policy {
     tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = azurerm_user_assigned_identity.identity.principal_id 
-
-    key_permissions    = var.key_permissions
-    secret_permissions = var.secret_permissions
-  }
-
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = azurerm_kubernetes_cluster.k8s.kubelet_identity[0].object_id
 
     key_permissions    = var.key_permissions
     secret_permissions = var.secret_permissions
   }
-  depends_on = [
-    azurerm_kubernetes_cluster.k8s
-  ]
 
 }
 

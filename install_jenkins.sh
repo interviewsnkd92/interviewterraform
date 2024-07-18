@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-#Java installation
+#Java Git and Maven installation
 sudo apt update
-sudo apt install fontconfig openjdk-17-jre -y
+sudo apt install fontconfig openjdk-17-jre maven git -y
 
 #Docker installation
 
@@ -19,6 +19,7 @@ echo \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
+
 #Jenkins installation
 sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
   https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
@@ -54,12 +55,11 @@ sudo systemctl restart jenkins
 
 #Pipeline
 
-GIT_TOKEN=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
 
 echo '<com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl>                                      
 <scope>GLOBAL</scope>
   <id>git</id>
-  <description></description>
+  <description>${GIT_TOKEN}</description>
   <username></username>
   <password>
     ${GIT_TOKEN}
@@ -67,4 +67,5 @@ echo '<com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl>
 </com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl>'\
  | sudo java -jar /var/lib/jenkins/jenkins-cli.jar -s http://localhost:8080/ \
    create-credentials-by-xml system::system::jenkins _
+   
 

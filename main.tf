@@ -67,9 +67,7 @@ resource "azurerm_network_interface" "my_terraform_nic" {
   name                = "myNIC"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  depends_on = [
-    azurerm_network_security_group.my_terraform_nsg
-  ]  
+    
   ip_configuration {
     name                          = "my_nic_configuration"
     subnet_id                     = azurerm_subnet.my_terraform_subnet.id
@@ -100,23 +98,6 @@ resource "azurerm_storage_account" "my_storage_account" {
   resource_group_name      = azurerm_resource_group.rg.name
   account_tier             = "Standard"
   account_replication_type = "LRS"
-}
-
-
-
-resource "azurerm_user_assigned_identity" "identity" {
-  location            = azurerm_resource_group.rg.location
-  name                = "identity"
-  resource_group_name = azurerm_resource_group.rg.name
-}
-
-resource "azurerm_role_assignment" "identity" {
-  scope                = azurerm_key_vault.vault.id
-  role_definition_name = "Key Vault Certificate User"
-  principal_id         = azurerm_user_assigned_identity.identity.principal_id
-  depends_on = [
-    azurerm_kubernetes_cluster.k8s
-  ]
 }
 
 resource "azurerm_role_assignment" "k8s" {

@@ -1,10 +1,29 @@
 pipeline {
     agent any 
     stages {
-        stage('Stage 1') {
+        stage('Checkout the code') {
             steps {
-                echo 'Hello world!' 
+                git url: "https://github.com/learn-devops-fast/"
             }
         }
+        stage('Build the code') {
+            steps {
+                sh "mvn clean package"
+                }
+        }
+        stage('Build the docker image') {
+            steps {
+                sh "docker image build -t ${ACR}:${BUILD_NUMBER} ."
+                }
+        stage("Azure ACR Login and Push") {
+            steps {
+                withCredentials([UsernamePassword(credentialsId: "Azure_ACR_Credentials", passwordVariable: "password", usernameVariable: "username")]) {
+                    sh "docker login -u ${username} -p ${password} ${ACR}"
+                    sh "docker image push ${ACR}:${BUILD_NUMBER} "
+                }
+            }
+
+        }
     }
+}
 }

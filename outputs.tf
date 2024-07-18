@@ -9,6 +9,7 @@ output "public_ip_address" {
 output "tenant_id" {
   value     = data.azurerm_client_config.current.tenant_id
 }
+
 output "kubernetes_cluster_name" {
   value = azurerm_kubernetes_cluster.k8s.name
 }
