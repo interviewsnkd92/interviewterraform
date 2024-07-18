@@ -2,8 +2,20 @@
 
 variable "resource_group_location" {
   type        = string
-  default     = "eastus"
+  default     = "westeurope"
   description = "Location of the resource group."
+}
+
+variable "resource_group_name" {
+  type        = string
+  default     = "Denis-Candidate"
+  description = "Name of the resource group."
+}
+
+variable "resource_group_id" {
+  type        = string
+  default     = "/subscriptions/cac54a74-04fe-4cbf-91d0-dd16f5fd89bd/resourceGroups/Denis-Candidate"
+  description = "ID."
 }
 
 variable "resource_group_name_prefix" {

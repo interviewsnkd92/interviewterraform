@@ -14,8 +14,8 @@ locals {
 
 resource "azurerm_key_vault" "vault" {
   name                       = coalesce(var.vault_name, "vault-${random_string.azurerm_key_vault_name.result}")
-  location                   = azurerm_resource_group.rg.location
-  resource_group_name        = azurerm_resource_group.rg.name
+  location                   = var.resource_group_location
+  resource_group_name        = var.resource_group_name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   sku_name                   = var.sku_name
   soft_delete_retention_days = 7

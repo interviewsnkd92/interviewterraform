@@ -1,8 +1,8 @@
 # Linux Virtual Machine
 resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   name                  = "clouditinterview"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
+  location              = var.resource_group_location
+  resource_group_name   = var.resource_group_name
   network_interface_ids = [azurerm_network_interface.my_terraform_nic.id]
   size                  = "Standard_B1s"
   user_data             = filebase64("install_jenkins.sh")
