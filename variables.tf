@@ -14,7 +14,7 @@ variable "resource_group_name" {
 
 variable "resource_group_id" {
   type        = string
-  default     = "/subscriptions/cac54a74-04fe-4cbf-91d0-dd16f5fd89bd/resourceGroups/Denis-Candidate"
+  default     = "/subscriptions/71374dfe-10c7-4587-a5bb-fef57d8cc72a/resourceGroups/Denis-Candidate"
   description = "ID."
 }
 
