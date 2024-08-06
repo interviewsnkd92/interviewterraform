@@ -1,40 +1,47 @@
 {
-    "mode": "All",
-    "parameters": {
-        "effect": {
-          "type": "String",
-          "metadata": {
-            "displayName": "Effect",
-            "description": "The effect of the policy."
-          },
-          "allowedValues": [
-            "Audit",
-            "Disabled"'
-            "Deny"
-          ],
-          "defaultValue": "Deny"
-        }
+  "mode": "All",
+  "parameters": {
+    "effect": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Effect",
+        "description": "The effect of the policy."
       },
-      "policyRule": {
-        "if": {
-          "allOf": [
-            {
-              "field": "type",
-              "equals": "Microsoft.Authorization/roleDefinitions"
-            },
-            {
-              "field": "Microsoft.Authorization/roleDefinitions/type",
-              "equals": "CustomRole"
-            },
+      "allowedValues": [
+        "Audit",
+        "Disabled",
+        "Deny"
+      ],
+      "defaultValue": "Deny"
+    }
+  },
+  "policyRule": {
+    "if": {
+      "allOf": [
+        {
+          "field": "type",
+          "equals": "Microsoft.Authorization/roleDefinitions"
+        },
+        {
+          "field": "Microsoft.Authorization/roleDefinitions/type",
+          "equals": "CustomRole"
+        },
+        {
+          "anyOf": [
             {
               "field": "Microsoft.Authorization/roleDefinitions/permissions[*].actions[*]",
               "equals": "*"
+            },
+            {
+              "field": "Microsoft.Authorization/roleDefinitions/permissions[*].actions[*]",
+              "contains": "*/write"
             }
           ]
-        },
-      "then": {
-        "effect": "[parameters('effect')]"
-      }
+        }
+      ]
+    },
+    "then": {
+      "effect": "[parameters('effect')]"
     }
   }
-  
+}
